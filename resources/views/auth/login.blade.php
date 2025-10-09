@@ -24,7 +24,12 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Login</button>
+                    </div>
+                    <div class="text-center mt-3">
+                        <p>Don't have an account? <a href="{{ route('register') }}">Register here</a></p>
+                    </div>
                 </form>
             </div>
         </div>
