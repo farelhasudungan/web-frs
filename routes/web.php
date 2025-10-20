@@ -24,11 +24,13 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
-    // Course management (admin)
-    Route::resource('courses', CourseController::class);
+    // Course management (lecturers and admins only)
+    Route::middleware(['role:lecturer,admin'])->group(function () {
+        Route::resource('courses', CourseController::class);
+    });
 
     // Enrollment routes (students)
-    Route::prefix('enrollments')->name('enrollments.')->group(function () {
+    Route::middleware(['role:student'])->prefix('enrollments')->name('enrollments.')->group(function () {
         Route::get('/available', [EnrollmentController::class, 'availableCourses'])->name('available');
         Route::get('/my-courses', [EnrollmentController::class, 'myCourses'])->name('my-courses');
         Route::post('/enroll/{course}', [EnrollmentController::class, 'enroll'])->name('enroll');

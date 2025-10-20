@@ -6,7 +6,7 @@
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Welcome, {{ Auth::user()->name }}!</h1>
+            <h1>Welcome, {{ Auth::user()->student->student_name }}!</h1>
             <small class="text-muted">Course Registration System Dashboard</small>
         </div>
     </div>
@@ -19,7 +19,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <h5 class="card-title">My Courses</h5>
-                        <h2>{{ Auth::user()->enrolledCourses()->count() }}</h2>
+                        <h2>{{ Auth::user()->student->enrolledCourses()->count() }}</h2>
                     </div>
                     <div class="align-self-center">
                         <i class="bi bi-book" style="font-size: 2rem;"></i>
@@ -35,7 +35,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <h5 class="card-title">Completed</h5>
-                        <h2>{{ Auth::user()->completedCourses()->count() }}</h2>
+                        <h2>{{ Auth::user()->student->completedCourses()->count() }}</h2>
                     </div>
                     <div class="align-self-center">
                         <i class="bi bi-check-circle" style="font-size: 2rem;"></i>
@@ -67,7 +67,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <h5 class="card-title">Credits</h5>
-                        <h2>{{ Auth::user()->enrolledCourses()->sum('credits') }}</h2>
+                        <h2>{{ Auth::user()->student->enrolledCourses()->sum('credits') }}</h2>
                     </div>
                     <div class="align-self-center">
                         <i class="bi bi-star" style="font-size: 2rem;"></i>
@@ -101,11 +101,6 @@
                             <i class="bi bi-gear"></i> Manage Courses
                         </a>
                     </div>
-                    <div class="col-md-3 mb-2">
-                        <a href="#" class="btn btn-outline-secondary w-100">
-                            <i class="bi bi-person"></i> Profile
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>
@@ -119,7 +114,7 @@
                 <h5 class="mb-0">My Current Enrollments</h5>
             </div>
             <div class="card-body">
-                @if(Auth::user()->enrolledCourses()->count() > 0)
+                @if(Auth::user()->student->enrolledCourses()->count() > 0)
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -132,16 +127,13 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach(Auth::user()->enrolledCourses()->take(5)->get() as $course)
+                                @foreach(Auth::user()->student->enrolledCourses()->take(5)->get() as $course)
                                 <tr>
                                     <td>{{ $course->name }}</td>
                                     <td><span class="badge bg-secondary">{{ $course->code }}</span></td>
                                     <td>{{ $course->credits }}</td>
                                     <td>
                                         <span class="badge bg-primary">Enrolled</span>
-                                    </td>
-                                    <td>
-                                        <a href="#" class="btn btn-sm btn-outline-info">View</a>
                                     </td>
                                 </tr>
                                 @endforeach
@@ -170,10 +162,10 @@
             <div class="card-body">
                 <ul class="list-unstyled">
                     <li class="mb-2">
-                        <strong>Account:</strong> {{ Auth::user()->email }}
+                        <strong>Account:</strong> {{ Auth::user()->student->email }}
                     </li>
                     <li class="mb-2">
-                        <strong>Member Since:</strong> {{ Auth::user()->created_at->format('M Y') }}
+                        <strong>Member Since:</strong> {{ Auth::user()->student->created_at->format('M Y') }}
                     </li>
                     <li class="mb-2">
                         <strong>Last Login:</strong> {{ now()->format('M d, Y') }}

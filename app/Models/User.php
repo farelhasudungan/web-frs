@@ -4,8 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -25,6 +23,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
     ];
 
     /**
@@ -50,72 +49,43 @@ class User extends Authenticatable
         ];
     }
 
-    public function enrollments(): HasMany
+    public function student()
     {
-        return $this->hasMany(Enrollment::class);
+        return $this->hasOne(Student::class);
     }
 
-    public function courses(): BelongsToMany
+    public function lecturer()
     {
-        return $this->belongsToMany(Course::class, 'enrollments')
-                    ->withPivot('status', 'grade', 'completed_at')
-                    ->withTimestamps();
+        return $this->hasOne(Lecturer::class);
     }
-
-    public function enrolledCourses(): BelongsToMany
+    
+    public function admin()
     {
-        return $this->courses()->wherePivot('status', 'enrolled');
+        return $this->hasOne(Admin::class);
     }
-
-    public function completedCourses(): BelongsToMany
+    
+    public function isStudent(): bool
     {
-        return $this->courses()->wherePivot('status', 'completed');
+        return $this->role === 'student';
     }
-
-    public function hasCompletedCourse($courseId): bool
+    
+    public function isLecturer(): bool
     {
-        return $this->completedCourses()->where('courses.id', $courseId)->exists();
+        return $this->role === 'lecturer';
     }
-
-    public function hasCompletedPrerequisites(Course $course): bool
+    
+    public function isAdmin(): bool
     {
-        $prerequisiteIds = $course->prerequisites->pluck('id');
-        
-        if ($prerequisiteIds->isEmpty()) {
-            return true;
-        }
-
-        $completedIds = $this->completedCourses()->pluck('courses.id');
-        
-        return $prerequisiteIds->every(function ($id) use ($completedIds) {
-            return $completedIds->contains($id);
-        });
+        return $this->role === 'admin';
     }
-
-    public function canEnrollInCourse(Course $course): array
+    
+    public function roleProfile()
     {
-        $errors = [];
-
-        // Check if already enrolled
-        if ($this->enrolledCourses()->where('courses.id', $course->id)->exists()) {
-            $errors[] = 'Already enrolled in this course';
-        }
-
-        // Check if already completed
-        if ($this->hasCompletedCourse($course->id)) {
-            $errors[] = 'Already completed this course';
-        }
-
-        // Check prerequisites
-        if (!$this->hasCompletedPrerequisites($course)) {
-            $errors[] = 'Prerequisites not met';
-        }
-
-        // Check course availability
-        if (!$course->isAvailable()) {
-            $errors[] = 'Course is full or inactive';
-        }
-
-        return $errors;
+        return match($this->role) {
+            'student' => $this->student,
+            'lecturer' => $this->lecturer,
+            'admin' => $this->admin,
+            default => null
+        };
     }
 }

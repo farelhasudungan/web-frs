@@ -10,14 +10,14 @@ class CreateEnrollmentsTable extends Migration
     {
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('course_id')->constrained()->onDelete('cascade');
+            $table->foreignId('student_id')->constrained('students')->onDelete('cascade');
+            $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
             $table->enum('status', ['enrolled', 'completed', 'dropped'])->default('enrolled');
             $table->decimal('grade', 3, 2)->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
             
-            $table->unique(['user_id', 'course_id']);
+            $table->unique(['student_id', 'course_id']);
         });
     }
 

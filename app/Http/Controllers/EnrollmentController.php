@@ -13,15 +13,16 @@ class EnrollmentController extends Controller
     public function availableCourses()
     {
         $user = Auth::user();
-        $enrolledCourseIds = $user->courses()->pluck('courses.id');
+        $enrolledCourseIds = $user->student->courses()->pluck('courses.id');
         
         $courses = Course::with('prerequisites')
             ->where('status', 'active')
             ->whereNotIn('id', $enrolledCourseIds)
             ->get()
             ->map(function ($course) use ($user) {
-                $course->can_enroll = empty($user->canEnrollInCourse($course));
-                $course->enrollment_errors = $user->canEnrollInCourse($course);
+                $enrollErrors = (array) ($user->student->canEnrollInCourse($course) ?? []);
+                $course->can_enroll = empty($enrollErrors);
+                $course->enrollment_errors = $enrollErrors;
                 return $course;
             });
 
@@ -31,8 +32,8 @@ class EnrollmentController extends Controller
     public function myCourses()
     {
         $user = Auth::user();
-        $enrolledCourses = $user->enrolledCourses()->get();
-        $completedCourses = $user->completedCourses()->get();
+        $enrolledCourses = $user->student->enrolledCourses()->get();
+        $completedCourses = $user->student->completedCourses()->get();
         
         return view('enrollments.my-courses', compact('enrolledCourses', 'completedCourses'));
     }
@@ -40,7 +41,7 @@ class EnrollmentController extends Controller
     public function enroll(Request $request, Course $course)
     {
         $user = Auth::user();
-        $errors = $user->canEnrollInCourse($course);
+        $errors = $user->student->canEnrollInCourse($course);
 
         if (!empty($errors)) {
             return redirect()->back()
@@ -49,7 +50,7 @@ class EnrollmentController extends Controller
 
         DB::transaction(function () use ($user, $course) {
             Enrollment::create([
-                'user_id' => $user->id,
+                'student_id' => $user->student->id,
                 'course_id' => $course->id,
                 'status' => 'enrolled'
             ]);
@@ -64,7 +65,7 @@ class EnrollmentController extends Controller
     public function drop(Course $course)
     {
         $user = Auth::user();
-        $enrollment = Enrollment::where('user_id', $user->id)
+        $enrollment = Enrollment::where('student_id', $user->student->id)
             ->where('course_id', $course->id)
             ->where('status', 'enrolled')
             ->first();
