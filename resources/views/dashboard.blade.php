@@ -101,6 +101,11 @@
                             <i class="bi bi-gear"></i> Manage Courses
                         </a>
                     </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{{ route('profile.show') }}" class="btn btn-outline-warning w-100">
+                            <i class="bi bi-person-circle"></i> My Profile
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -123,7 +128,6 @@
                                     <th>Code</th>
                                     <th>Credits</th>
                                     <th>Status</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>

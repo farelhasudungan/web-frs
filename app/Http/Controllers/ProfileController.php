@@ -64,32 +64,38 @@ class ProfileController extends Controller
                     'admission_year' => 'required|integer|min:2000|max:' . (date('Y') + 1)
                 ]);
                 
-                $validated['user_id'] = $user->id;
-                $validated['email'] = $user->email;
-                Student::create($validated);
+                $validated['user_id'] = Auth::id();
+                $validated['email'] = Auth::user()->email;
+                
+                Student::updateOrCreate(['user_id' => $user->id], $validated);
                 break;
                 
             case 'lecturer':
                 $validated = $request->validate([
                     'lecturer_name' => 'required|string|max:255',
-                    'employee_id' => 'required|string|max:50|unique:lecturers',
                     'department' => 'required|string|max:255',
                     'phone' => 'nullable|string|max:20',
-                    'specialization' => 'nullable|string'
+                    'address' => 'required|string',
+                    'laboratorium' => 'nullable|string'
                 ]);
                 
-                $validated['user_id'] = $user->id;
-                Lecturer::create($validated);
+                $validated['user_id'] = Auth::id();
+                $validated['email'] = Auth::user()->email;
+
+                Lecturer::updateOrCreate(['user_id' => $user->id], $validated);
                 break;
                 
             case 'admin':
                 $validated = $request->validate([
                     'admin_name' => 'required|string|max:255',
-                    'department' => 'nullable|string|max:255'
+                    'department' => 'nullable|string|max:255',
+                    'address' => 'required|string'
                 ]);
                 
-                $validated['user_id'] = $user->id;
-                Admin::create($validated);
+                $validated['user_id'] = Auth::id();
+                $validated['email'] = Auth::user()->email;
+
+                Admin::updateOrCreate(['user_id' => $user->id], $validated);
                 break;
                 
             default:

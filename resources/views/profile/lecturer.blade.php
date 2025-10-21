@@ -13,6 +13,7 @@
                 <p class="card-text"><strong>Phone:</strong> {{ Auth::user()->lecturer->phone }}</p>
                 <p class="card-text"><strong>Department:</strong> {{ Auth::user()->lecturer->department }}</p>
                 <p class="card-text"><strong>Laboratorium:</strong> {{ Auth::user()->lecturer->laboratorium }}</p>
+                <p class="card-text"><strong>Address:</strong> {{ Auth::user()->lecturer->address }}</p>
                 <a href="{{ route('profile.setup') }}" class="btn btn-primary">Edit Profile</a>
             </div>
         </div>

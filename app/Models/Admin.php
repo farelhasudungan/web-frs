@@ -7,8 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Admin extends Model
 {
     protected $fillable = [
+        'user_id',
+        'email',
         'admin_name',
         'department',
         'address',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

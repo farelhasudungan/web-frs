@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Lecturer extends Model
 {
     protected $fillable = [
+        'user_id',
+        'email',
         'lecturer_name',
         'department',
         'laboratorium',

@@ -9,10 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Student extends Model
 {
     protected $fillable = [
+        'user_id',
+        'email',
         'student_name',
         'phone',
         'date_of_birth',
         'address',
+        'admission_year',
     ];
 
     public function user()

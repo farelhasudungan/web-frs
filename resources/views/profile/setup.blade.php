@@ -2,46 +2,105 @@
 
 @section('title', 'Profile Setup - Course System')
 
-// I want to make edit/update user data based on their role, so make a check role first
-
 @section('content')
-<div class="row">
-    <div class="col-12">
-        <h1>Profile Setup</h1>
-        <div class="card mt-4">
-            <div class="card-body">
-                <form method="POST" action="{{ route('profile.update') }}">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="mb-3">
-                        @if(Auth::user()->role == 'student')
-                            <label for="student_name" class="form-label">Student Name</label>
-                            <input type="text" class="form-control" id="student_name" name="student_name" value="{{ Auth::user()->student->student_name }}" required>
-                        @elseif(Auth::user()->role == 'lecturer')
-                            <label for="lecturer_name" class="form-label">Lecturer Name</label>
-                            <input type="text" class="form-control" id="lecturer_name" name="lecturer_name" value="{{ Auth::user()->lecturer->lecturer_name }}" required>
-                        @elseif(Auth::user()->role == 'admin')
-                            <label for="admin_name" class="form-label">Admin Name</label>
-                            <input type="text" class="form-control" id="admin_name" name="admin_name" value="{{ Auth::user()->admin->admin_name }}" required>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Complete Your {{ ucfirst($user->role) }} Profile</div>
+                
+                <div class="card-body">
+                    @if(session('message'))
+                        <div class="alert alert-info">{{ session('message') }}</div>
+                    @endif
+                    
+                    <form method="POST" action="{{ route('profile.store') }}">
+                        @csrf
+                        
+                        @if($user->role === 'student')
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" name="student_name" 
+                                       value="{{ optional($user->student)->student_name ?? $user->name }}" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" name="phone" 
+                                       value="{{ optional($user->student)->phone }}" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" name="date_of_birth" 
+                                       value="{{ optional($user->student)->date_of_birth }}" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="3" required>{{ optional($user->student)->address }}</textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Admission Year</label>
+                                <input type="number" class="form-control" name="admission_year" 
+                                       value="{{ optional($user->student)->admission_year ?? date('Y') }}"
+                                       min="2000" max="{{ date('Y') + 1 }}" required>
+                            </div>
                         @endif
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email address</label>
-                        <input type="email" class="form-control" id="email" name="email" value="{{ Auth::user()->email }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="address" class="form-label">Address</label>
-                        <textarea class="form-control" id="address" name="address" rows="3" required>
-                            {{  Auth::user()->role == 'student' ? Auth::user()->student->address :
-                                (Auth::user()->role == 'lecturer' ? Auth::user()->lecturer->address :
-                                (Auth::user()->role == 'admin' ? Auth::user()->admin->address : ''))
-                            }}
-                        </textarea>
-                   </div>
-                    <button type="submit" class="btn btn-primary">Update Profile</button>
-                </form>
-            </div> 
+
+                        @if($user->role === 'lecturer')
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" name="lecturer_name" 
+                                       value="{{ optional($user->lecturer)->lecturer_name ?? $user->name }}" required>
+                            </div> 
+
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-control" name="phone" 
+                                       value="{{ optional($user->lecturer)->phone }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Department</label>
+                                <input type="text" class="form-control" name="department" 
+                                       value="{{ optional($user->lecturer)->department }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Laboratorium</label>
+                                <input type="text" class="form-control" name="laboratorium" 
+                                       value="{{ optional($user->lecturer)->laboratorium }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="3" required>{{ optional($user->lecturer)->address }}</textarea>
+                            </div>
+                        @endif
+
+                        @if($user->role === 'admin')
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" name="admin_name" 
+                                       value="{{ optional($user->admin)->admin_name ?? $user->name }}" required>
+                            </div> 
+                            <div class="mb-3">
+                                <label class="form-label">Department</label>
+                                <input type="text" class="form-control" name="department" 
+                                       value="{{ optional($user->admin)->department }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="3" required>{{ optional($user->admin)->address }}</textarea>
+                            </div>
+                        @endif
+                        
+                        <button type="submit" class="btn btn-primary">
+                            Save Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>
