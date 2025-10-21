@@ -42,7 +42,7 @@ class RegisterController extends Controller
         // Log the user in after registration
         Auth::login($user);
 
-        return redirect()->route('dashboard')
+        return redirect()->route('profile.setup')
             ->with('success', 'Registration successful! Welcome to FRS System.');
     }
 
