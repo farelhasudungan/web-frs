@@ -13,9 +13,16 @@
             <div class="navbar-nav ms-auto">
                 @auth
                     <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
-                    <a class="nav-link" href="{{ route('courses.index') }}">Manage Courses</a>
-                    <a class="nav-link" href="{{ route('enrollments.available') }}">Available Courses</a>
-                    <a class="nav-link" href="{{ route('enrollments.my-courses') }}">My Courses</a>
+                    @if(Auth::user()->role === 'admin')
+                        <a class="nav-link" href="{{ route('admin.users.index') }}">Manage Users</a>
+                    @endif
+                    @if(Auth::user()->role === 'lecturer')
+                        <a class="nav-link" href="{{ route('courses.index') }}">Manage Courses</a>
+                    @endif
+                    @if(Auth::user()->role === 'student')
+                        <a class="nav-link" href="{{ route('enrollments.available') }}">Available Courses</a>
+                        <a class="nav-link" href="{{ route('enrollments.my-courses') }}">My Courses</a>
+                    @endif
                     <form action="{{ route('logout') }}" method="POST" class="d-inline">
                         @csrf
                         <button type="submit" class="btn btn-link nav-link">Logout</button>

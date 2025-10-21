@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lecturer extends Model
@@ -23,8 +24,17 @@ class Lecturer extends Model
         return $this->belongsTo(User::class);
     }
     
-    public function courses(): HasMany
+    public function courses()
     {
-        return $this->hasMany(Course::class);
+        return $this->belongsToMany(Course::class, 'course_lecturer');
+    }
+
+
+    public function students()
+    {
+        return Student::whereHas('enrollments.course.lecturers', function($query) {
+            $query->where('lecturers.id', $this->id)
+                ->where('enrollments.status', 'enrolled');
+        });
     }
 }

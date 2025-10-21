@@ -13,6 +13,19 @@ class Course extends Model
         'max_students', 'enrolled_count', 'status'
     ];
 
+    public function lecturers()
+    {
+        return $this->belongsToMany(Lecturer::class, 'course_lecturer');
+    }
+
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(Student::class, 'enrollments')
+                    ->withPivot('status', 'grade', 'completed_at')
+                    ->withTimestamps();
+    }
+
+
     // relasi many-to-many ke model course sendiri (self-referencing) melalui tabel pivot course_dependencies
     public function prerequisites(): BelongsToMany
     {

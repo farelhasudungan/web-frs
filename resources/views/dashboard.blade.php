@@ -6,12 +6,13 @@
 <div class="row">
     <div class="col-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Welcome, {{ Auth::user()->student->student_name }}!</h1>
+            <h1>Welcome, {{ Auth::user()->name }}!</h1>
             <small class="text-muted">Course Registration System Dashboard</small>
         </div>
     </div>
 </div>
 
+@if(Auth::user()->role === 'student')
 <div class="row">
     <div class="col-md-3 mb-4">
         <div class="card text-white bg-primary">
@@ -77,6 +78,63 @@
         </div>
     </div>
 </div>
+@endif
+
+@if(Auth::user()->role === 'lecturer')
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">My Courses</h5>
+                        <h2>{{ Auth::user()->lecturer->courses()->count() }}</h2>
+                    </div> 
+                    <div class="align-self-center">
+                        <i class="bi bi-book" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Total Students</h5>
+                        <h2>{{ Auth::user()->lecturer->courses()->withCount('students')->get()->sum('students_count') }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-person" style="font-size: 2rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+@if(Auth::user()->role === 'admin')
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Total Users</h5>
+                        <h2>{{ \App\Models\User::count() }}</h2>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="bi bi-people" style="font-size: 2rem;"></i>
+                        <span class="visually-hidden">Total Users</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 <div class="row mb-4">
     <div class="col-12">
@@ -86,6 +144,7 @@
             </div>
             <div class="card-body">
                 <div class="row">
+                    @if(Auth::user()->role === 'student')
                     <div class="col-md-3 mb-2">
                         <a href="{{ route('enrollments.available') }}" class="btn btn-outline-primary w-100">
                             <i class="bi bi-search"></i> Browse Courses
@@ -96,11 +155,16 @@
                             <i class="bi bi-list-ul"></i> My Courses
                         </a>
                     </div>
+                    @endif
+
+                    @if(Auth::user()->role === 'lecturer')
                     <div class="col-md-3 mb-2">
                         <a href="{{ route('courses.index') }}" class="btn btn-outline-info w-100">
                             <i class="bi bi-gear"></i> Manage Courses
                         </a>
                     </div>
+                    @endif
+
                     <div class="col-md-3 mb-2">
                         <a href="{{ route('profile.show') }}" class="btn btn-outline-warning w-100">
                             <i class="bi bi-person-circle"></i> My Profile
@@ -112,7 +176,9 @@
     </div>
 </div>
 
+
 <div class="row">
+    @if(Auth::user()->role === 'student')
     <div class="col-md-8">
         <div class="card">
             <div class="card-header">
@@ -157,6 +223,20 @@
             </div>
         </div>
     </div>
+    @endif
+
+    @if(Auth::user()->role === 'lecturer' || Auth::user()->role === 'admin')
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Activities</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">No recent activities to show.</p>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <div class="col-md-4">
         <div class="card">
@@ -166,10 +246,10 @@
             <div class="card-body">
                 <ul class="list-unstyled">
                     <li class="mb-2">
-                        <strong>Account:</strong> {{ Auth::user()->student->email }}
+                        <strong>Account:</strong> {{ Auth::user()->email }}
                     </li>
                     <li class="mb-2">
-                        <strong>Member Since:</strong> {{ Auth::user()->student->created_at->format('M Y') }}
+                        <strong>Member Since:</strong> {{ Auth::user()->created_at->format('M Y') }}
                     </li>
                     <li class="mb-2">
                         <strong>Last Login:</strong> {{ now()->format('M d, Y') }}
