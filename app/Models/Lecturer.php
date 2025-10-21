@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Lecturer extends Model
 {
     protected $fillable = [
-        'user_id',
         'lecturer_name',
         'department',
         'laboratorium',
         'phone',
+        'address',
     ];
     
     public function user()
