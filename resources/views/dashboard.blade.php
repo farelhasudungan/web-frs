@@ -4,7 +4,8 @@
 
 @section('content')
 <!-- Enhanced Dashboard Blade (stardust removed + brighter blue background + high-contrast tables + hover white text on menu)
-     Updated: BLACK thick outlines around each table for high contrast -->
+     Updated: BLACK thick outlines around each table for high contrast
+     Modified: Recent Activities cleaned, limited to max 3 items, nicer circle colors; System Info shifted slightly to the right; Recent Activities column widened. -->
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
@@ -245,12 +246,12 @@
     }
 
     .activity-list li {
-        padding: 0.75rem 0;
-        border-bottom: 1px solid rgba(11,37,69,0.08);
+        padding: 0.6rem 0.25rem;
+        border-bottom: 1px solid rgba(11,37,69,0.06);
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        transition: all 0.2s ease;
+        transition: all 0.18s ease;
     }
 
     .activity-list li:last-child {
@@ -258,37 +259,44 @@
     }
 
     .activity-list li:hover {
-        background: rgba(13,110,253,0.04);
+        background: rgba(13,110,253,0.03);
         padding-left: 0.5rem;
         border-radius: 6px;
     }
 
+    /* bigger, neater circular badge for activity icons */
     .activity-icon-badge {
-        width: 36px;
-        height: 36px;
+        width: 44px;
+        height: 44px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1rem;
+        font-size: 1.05rem;
         flex-shrink: 0;
+        color: #fff;
+        box-shadow: 0 6px 18px rgba(11,37,69,0.08);
+        border: 3px solid rgba(255,255,255,0.8);
     }
 
-    .activity-content {
-        flex: 1;
-        min-width: 0;
-    }
+    /* defined palette for consistent colors */
+    .activity-badge-primary{ background: linear-gradient(135deg,#0d6efd 0%,#3aa0ff 100%); }
+    .activity-badge-success{ background: linear-gradient(135deg,#198754 0%,#4bd08f 100%); }
+    .activity-badge-info{ background: linear-gradient(135deg,#0dcaf0 0%,#7be6ff 100%); }
+    .activity-badge-warning{ background: linear-gradient(135deg,#ffc107 0%,#ffd86b 100%); color:#06325a; }
 
-    .activity-text {
-        font-size: 0.9rem;
-        color: #0b2545;
-        display: block;
-        margin-bottom: 0.15rem;
-    }
+    .activity-content { flex:1; min-width:0; }
+    .activity-text { font-size:0.95rem; color:#07203a; display:block; margin-bottom:0.15rem; font-weight:600; }
+    .activity-time { font-size:0.78rem; color: rgba(11,37,69,0.5); }
 
-    .activity-time {
-        font-size: 0.75rem;
-        color: rgba(11,37,69,0.5);
+    /* Slight right-shift for system info column (keeps responsive) */
+    .system-info-column { display:flex; justify-content:flex-end; }
+    .system-info-column .system-info-card { max-width: 100%; transform: translateX(8%); }
+
+    /* responsive tweaks for when the layout stacks */
+    @media (max-width: 767px){
+        .system-info-column { justify-content:flex-start; }
+        .system-info-column .system-info-card { transform:none; }
     }
 
 </style>
@@ -596,45 +604,71 @@
             @if(Auth::user()->role === 'admin')
             <div class="row g-3">
                 {{-- Recent Activities --}}
-                <div class="col-md-6">
+                <div class="col-md-7">
                     <div class="card system-card enroll-card fade-in-up">
                         <div class="card-header">
                             <h5 class="mb-0 enroll-title">Recent Activities</h5>
                         </div>
                         <div class="card-body">
-                            <ul class="activity-list">
-                                <li>
-                                    <span class="activity-icon-badge bg-primary text-white">
-                                        <i class="bi bi-person-plus-fill"></i>
-                                    </span>
-                                    <div class="activity-content">
-                                        <span class="activity-text">New student account created</span>
-                                        <span
-                                        <li>
-                                    <span class="activity-icon-badge bg-success text-white">
-                                        <i class="bi bi-journal-check"></i>
-                                    </span>
-                                    <div class="activity-content">
-                                        <span class="activity-text">Advanced Database Systems published</span>
-                                        <span class="activity-time">5 hours ago</span>
-                                    </div>
-                                </li>
-                                <li>
-                                    <span class="activity-icon-badge bg-info text-white">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </span>
-                                    <div class="activity-content">
-                                        <span class="activity-text">Lecturer profile updated</span>
-                                        <span class="activity-time">1 day ago</span>
-                                    </div>
-                                </li>
-                            </ul>
+
+                            {{-- Determine recent activities: prefer injected $recentActivities, else try Activity model, else fallback to static sample --}}
+                            @php
+                                if (!isset($recentActivities)) {
+                                    if (class_exists('App\\Models\\Activity')) {
+                                        try {
+                                            $recentActivities = \App\Models\Activity::latest()->take(3)->get();
+                                        } catch (Throwable $e) {
+                                            $recentActivities = collect();
+                                        }
+                                    } else {
+                                        $recentActivities = collect([
+                                            (object)[ 'icon' => 'bi-person-plus-fill', 'text' => 'New student account created', 'time' => '2 hours ago', 'type' => 'primary' ],
+                                            (object)[ 'icon' => 'bi-journal-check', 'text' => 'Advanced Database Systems published', 'time' => '5 hours ago', 'type' => 'success' ],
+                                            (object)[ 'icon' => 'bi-pencil-square', 'text' => 'Lecturer profile updated', 'time' => '1 day ago', 'type' => 'info' ],
+                                        ]);
+                                    }
+                                }
+
+                                // Ensure maximum 3 items
+                                $recentActivities = $recentActivities->take(3);
+                            @endphp
+
+                            @if($recentActivities->count())
+                                <ul class="activity-list mb-0">
+                                    @foreach($recentActivities as $act)
+                                    <li>
+                                        @php
+                                            // if $act is a model, try to extract fields; otherwise assume object with properties
+                                            $icon = property_exists($act, 'icon') ? $act->icon : (data_get($act, 'icon') ?: 'bi-info-circle');
+                                            $text = property_exists($act, 'text') ? $act->text : (data_get($act, 'description') ?: data_get($act, 'title', 'Activity'));
+                                            $time = property_exists($act, 'time') ? $act->time : (data_get($act, 'created_at') ? \Carbon\Carbon::parse(data_get($act,'created_at'))->diffForHumans() : 'just now');
+                                            $type = property_exists($act, 'type') ? $act->type : (data_get($act,'level') ?: 'info');
+                                            $badgeClass = 'activity-badge-info';
+                                            if(in_array($type, ['primary','info','success','warning'])) {
+                                                $badgeClass = 'activity-badge-'. $type;
+                                            }
+                                        @endphp
+
+                                        <span class="activity-icon-badge {{ $badgeClass }}">
+                                            <i class="{{ $icon }}"></i>
+                                        </span>
+                                        <div class="activity-content">
+                                            <span class="activity-text">{{ $text }}</span>
+                                            <span class="activity-time">{{ $time }}</span>
+                                        </div>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-muted mb-0">No recent activities to show.</p>
+                            @endif
+
                         </div>
                     </div>
                 </div>
 
                 {{-- System Information --}}
-                <div class="col-md-6">
+                <div class="col-md-5 system-info-column">
                     <div class="card system-card system-info-card fade-in-up">
                         <div class="card-header">
                             <h5 class="mb-0">System Information</h5>
