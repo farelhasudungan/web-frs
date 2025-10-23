@@ -123,12 +123,10 @@
 
                             <div class="d-flex gap-2" style="margin-top:1rem;">
                                 <a href="{{ route('profile.setup') }}" class="btn-wave" role="button" data-wave>Edit Profile</a>
-                                <a href="{{ route('admin.dashboard') }}" class="btn-outline" role="button" data-wave>Admin Dashboard</a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Example admin summary table (optional) -->
                     <div class="card system-card mt-3">
                         <div class="card-header">
                             <h5 class="mb-0">Site Summary</h5>
@@ -151,10 +149,6 @@
                                         <tr>
                                             <td>Active Courses</td>
                                             <td>{{ \App\Models\Course::where('status','active')->count() }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pending Profiles</td>
-                                            <td>{{ \App\Models\User::whereNull('profile_completed')->count() }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

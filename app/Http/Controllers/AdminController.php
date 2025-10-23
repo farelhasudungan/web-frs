@@ -26,7 +26,7 @@ class AdminController extends Controller
         // Minimal fallback — kembalikan data ringkas
         $data = [
             'title' => 'Admin Dashboard',
-            'message' => 'Welcome to Admin Dashboard. Create view: resources/views/admin/dashboard.blade.php',
+            'message' => 'Welcome to Admin Dashboard.',
         ];
 
         return view('admin.fallback-dashboard', $data);
